@@ -1,12 +1,10 @@
 import logging
 from logging.config import fileConfig
 
+from alembic import context
 from flask import current_app
 
-from alembic import context
-
-from app.models.db.manufacturers import Manufacturer
-from app.models.db.starships import StarshipManufacturer, Starship
+from app.models.db.starships import StarshipManufacturer, Starship, Manufacturer
 from app.models.db.sync_metadata import SyncMetadata
 
 # this is the Alembic Config object, which provides
