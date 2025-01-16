@@ -1,6 +1,6 @@
 from typing import List
 
-from app.models.starships import Starship
+from app.models.schemas.starships import Starship
 from app.services.api_client import SWAPIClient
 
 

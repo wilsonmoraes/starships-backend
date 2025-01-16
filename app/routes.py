@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 
 from .auth import authenticate_user, login_user, logout_user, is_authenticated
-from .services import get_detailed_starships
 
 app_routes = Blueprint("app_routes", __name__)
 
@@ -34,7 +33,7 @@ def dashboard():
     manufacturer_filter = request.args.get("manufacturer")
 
     # Obter naves detalhadas
-    detailed_starships = get_detailed_starships()
+    detailed_starships = []
 
     # Filtrar por fabricante, se necessário
     if manufacturer_filter:
