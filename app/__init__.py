@@ -14,7 +14,7 @@ def create_app():
 
     app.secret_key = "supersecretkey"
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///starships.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_ECHO"] = True
 
