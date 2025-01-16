@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starships Dashboard</title>
+</head>
+<body>
+<h1>Starships Dashboard</h1>
+<form method="GET" action="/dashboard">
+    <label for="manufacturer">Filter by Manufacturer:</label>
+    <select name="manufacturer" id="manufacturer" onchange="this.form.submit()">
+        <option value="">All Manufacturers</option>
+        {% for manufacturer in manufacturers %}
+            <option value="{{ manufacturer }}" {% if manufacturer == selected_manufacturer %}selected{% endif %}>
+                {{ manufacturer }}
+            </option>
+        {% endfor %}
+    </select>
+</form>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Manufacturer</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for starship in starships %}
+        <tr>
+            <td>{{ starship['name'] }}</td>
+            <td>{{ starship['manufacturer'] }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<form method="GET" action="/logout">
+    <button type="submit">Logout</button>
+</form>
+</body>
+</html>
