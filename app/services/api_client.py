@@ -1,10 +1,16 @@
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+BASE_URL = os.environ["BASE_URL"]
+
 from typing import Dict, Any
 
 import requests
 
 
 class SWAPIClient:
-    BASE_URL = "https://www.swapi.tech/api"
 
     @staticmethod
     def get_starships(page: int = 1, name: str = None, model: str = None):
@@ -16,7 +22,7 @@ class SWAPIClient:
             model (str, optional): Filter by starship model.
 
         """
-        url = f"{SWAPIClient.BASE_URL}/starships/?page={page}"
+        url = f"{BASE_URL}/starships/?page={page}"
         if name:
             url += f"&name={name}"
         if model:
@@ -30,7 +36,7 @@ class SWAPIClient:
         """
         Fetch a single starship by ID from the SWAPI.
         """
-        url = f"{SWAPIClient.BASE_URL}/starships/{starship_id}"
+        url = f"{BASE_URL}/starships/{starship_id}"
         response = requests.get(url)
         response.raise_for_status()
         return response.json()
