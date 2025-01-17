@@ -1,9 +1,11 @@
 import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from flasgger import Swagger
 from flask import Flask
 from flask_cors import CORS
-from flasgger import Swagger
+from flask_jwt_extended import JWTManager
+
 from app.models.db import init_db
 from app.sync.sync_job import SyncJob
 
@@ -25,8 +27,8 @@ def create_app():
     app.register_blueprint(app_routes)
     CORS(app)
 
-    swagger = Swagger(app)
-
+    Swagger(app)
+    JWTManager(app)
     return app
 
 
