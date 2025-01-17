@@ -39,7 +39,7 @@ def dashboard():
     manufacturer_filter = request.args.get("manufacturer")
 
     try:
-        # Fetch manufacturers from API
+        # Fetch manufacturers
         manufacturers_response = requests.get(url_for("app_routes.get_manufacturers", _external=True))
         manufacturers_response.raise_for_status()
         manufacturers = manufacturers_response.json()
@@ -62,7 +62,7 @@ def dashboard():
         "dashboard.html",
         starships=detailed_starships,
         manufacturers=manufacturers,
-        selected_manufacturer=manufacturer_filter
+        selected_manufacturer=manufacturer_filter  # Passa o ID selecionado
     )
 
 
