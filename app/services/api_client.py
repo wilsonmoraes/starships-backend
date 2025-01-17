@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 BASE_URL = os.environ["BASE_URL"]
 
-from typing import Any, Dict
-
 import requests
+
+from typing import Any, Dict
 
 
 class SWAPIClient:
