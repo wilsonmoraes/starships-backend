@@ -2,6 +2,7 @@ import os
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
+from flask_cors import CORS
 
 from app.models.db import init_db
 from app.sync.sync_job import SyncJob
@@ -22,6 +23,7 @@ def create_app():
 
     from app.routes import app_routes
     app.register_blueprint(app_routes)
+    CORS(app)
 
     return app
 
