@@ -1,4 +1,5 @@
 import logging
+import re
 from datetime import datetime, timedelta
 
 from app.models.db import db
@@ -7,6 +8,11 @@ from app.models.db.sync_metadata import SyncMetadata
 from app.services.api_client import SWAPIClient
 
 logger = logging.getLogger(__name__)
+
+
+def parse_manufacturers(manufacturer_data):
+    manufacturers = re.findall(r'[^,]*?, Inc\.|[^,]+', manufacturer_data)
+    return [m.strip() for m in manufacturers]
 
 
 def parse_numeric_value(value, data_type=float):
@@ -40,7 +46,7 @@ class SyncJob:
 
             if sync_metadata.is_running:
                 if sync_metadata.last_synced and sync_metadata.last_synced < current_time - timedelta(
-                    hours=5
+                        hours=5
                 ):
                     logger.warning("Synchronization stuck for over 5 hours. Restarting...")
                 else:
@@ -105,7 +111,7 @@ class SyncJob:
             ids_to_delete = [curr_id for curr_id in db_ids if curr_id not in ids_to_keep]
 
             for i in range(0, len(ids_to_delete), batch_size):
-                batch = ids_to_delete[i : i + batch_size]
+                batch = ids_to_delete[i: i + batch_size]
                 Starship.query.filter(Starship.id.in_(batch)).delete(synchronize_session=False)
 
             db.session.commit()
@@ -166,7 +172,7 @@ class SyncJob:
         from run import application
 
         with application.app_context():
-            manufacturers = manufacturer_data.split(", ")
+            manufacturers = parse_manufacturers(manufacturer_data)
             for manufacturer_name in manufacturers:
                 manufacturer = Manufacturer.query.filter_by(name=manufacturer_name).first()
                 if not manufacturer:

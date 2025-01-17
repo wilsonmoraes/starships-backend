@@ -36,10 +36,10 @@ def create_app():
 scheduler = BackgroundScheduler()
 scheduler.start()
 
-# scheduler.add_job(
-#     id="sync_starships",
-#     func=SyncJob.sync_starships,
-#     trigger="interval",
-#     seconds=10,
-#     replace_existing=True,
-# )
+scheduler.add_job(
+    id="sync_starships",
+    func=SyncJob.sync_starships,
+    trigger="interval",
+    seconds=10,
+    replace_existing=True,
+)
