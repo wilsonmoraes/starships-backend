@@ -1,16 +1,14 @@
+from sqlalchemy import Table, Integer, ForeignKey, Column
+
 from app.models.db import db
 
 
-class Manufacturer(db.Model):
-    __tablename__ = "manufacturers"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, unique=True)
-
-    starships = db.relationship(
-        "StarshipManufacturer", back_populates="manufacturer", cascade="all, delete-orphan"
-    )
-
+starship_manufacturer = Table(
+    "starship_manufacturer",
+    db.Model.metadata,
+    Column("starship_id", Integer, ForeignKey("starships.id"), primary_key=True),
+    Column("manufacturer_id", Integer, ForeignKey("manufacturers.id"), primary_key=True),
+)
 
 class Starship(db.Model):
     __tablename__ = "starships"
@@ -33,16 +31,19 @@ class Starship(db.Model):
     url = db.Column(db.String, nullable=False)
 
     manufacturers = db.relationship(
-        "StarshipManufacturer", back_populates="starship", cascade="all, delete-orphan"
+        "Manufacturer",
+        secondary="starship_manufacturer",
+        back_populates="starships",
     )
 
-
-class StarshipManufacturer(db.Model):
-    __tablename__ = "starship_manufacturers"
+class Manufacturer(db.Model):
+    __tablename__ = "manufacturers"
 
     id = db.Column(db.Integer, primary_key=True)
-    starship_id = db.Column(db.String, db.ForeignKey("starships.id"), nullable=False)
-    manufacturer_id = db.Column(db.Integer, db.ForeignKey("manufacturers.id"), nullable=False)
+    name = db.Column(db.String, nullable=False, unique=True)
 
-    starship = db.relationship("Starship", back_populates="manufacturers")
-    manufacturer = db.relationship("Manufacturer", back_populates="starships")
+    starships = db.relationship(
+        "Starship",
+        secondary="starship_manufacturer",
+        back_populates="manufacturers",
+    )

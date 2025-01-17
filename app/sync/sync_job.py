@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 
 from app.models.db import db
-from app.models.db.starships import Starship, Manufacturer, StarshipManufacturer
+from app.models.db.starships import Starship, Manufacturer, starship_manufacturer
 from app.models.db.sync_metadata import SyncMetadata
 from app.services.api_client import SWAPIClient
 
@@ -147,15 +147,25 @@ class SyncJob:
         with application.app_context():
             manufacturers = manufacturer_data.split(", ")
             for manufacturer_name in manufacturers:
+
                 manufacturer = Manufacturer.query.filter_by(name=manufacturer_name).first()
                 if not manufacturer:
                     manufacturer = Manufacturer(name=manufacturer_name)
                     db.session.add(manufacturer)
                     db.session.commit()
 
-                if not StarshipManufacturer.query.filter_by(
-                        starship_id=starship.id, manufacturer_id=manufacturer.id
-                ).first():
-                    relation = StarshipManufacturer(starship_id=starship.id, manufacturer_id=manufacturer.id)
-                    db.session.add(relation)
+                relation_exists = db.session.query(
+                    db.exists().where(
+                        starship_manufacturer.c.starship_id == starship.id,
+                        starship_manufacturer.c.manufacturer_id == manufacturer.id
+                    )
+                ).scalar()
+
+                if not relation_exists:
+                    # Criar relação entre nave e fabricante
+                    stmt = starship_manufacturer.insert().values(
+                        starship_id=starship.id,
+                        manufacturer_id=manufacturer.id
+                    )
+                    db.session.execute(stmt)
                     db.session.commit()

@@ -4,7 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 from flask import current_app
 
-from app.models.db.starships import StarshipManufacturer, Starship, Manufacturer
+from app.models.db.starships import starship_manufacturer, Starship, Manufacturer
 from app.models.db.sync_metadata import SyncMetadata
 
 # this is the Alembic Config object, which provides
@@ -39,7 +39,7 @@ def get_engine_url():
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 
-target_metadata = [Manufacturer.metadata, StarshipManufacturer.metadata, Starship.metadata, SyncMetadata.metadata]
+target_metadata = [Manufacturer.metadata, starship_manufacturer.metadata, Starship.metadata, SyncMetadata.metadata]
 config.set_main_option('sqlalchemy.url', get_engine_url())
 target_db = current_app.extensions['migrate'].db
 

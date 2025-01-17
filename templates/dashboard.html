@@ -12,8 +12,8 @@
     <select name="manufacturer" id="manufacturer" onchange="this.form.submit()">
         <option value="">All Manufacturers</option>
         {% for manufacturer in manufacturers %}
-            <option value="{{ manufacturer }}" {% if manufacturer == selected_manufacturer %}selected{% endif %}>
-                {{ manufacturer }}
+            <option value="{{ manufacturer['id'] }}" {% if manufacturer['id'] == selected_manufacturer %}selected{% endif %}>
+                {{ manufacturer['name'] }}
             </option>
         {% endfor %}
     </select>
@@ -23,14 +23,20 @@
     <thead>
     <tr>
         <th>Name</th>
-        <th>Manufacturer</th>
+        <th>Model</th>
+        <th>Class</th>
+        <th>Length</th>
+        <th>Manufacturer(s)</th>
     </tr>
     </thead>
     <tbody>
     {% for starship in starships %}
         <tr>
             <td>{{ starship['name'] }}</td>
-            <td>{{ starship['manufacturer'] }}</td>
+            <td>{{ starship['model'] }}</td>
+            <td>{{ starship['class'] }}</td>
+            <td>{{ starship['length'] }}</td>
+            <td>{{ ", ".join(starship['manufacturer']) }}</td>
         </tr>
     {% endfor %}
     </tbody>
