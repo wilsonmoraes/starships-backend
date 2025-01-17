@@ -1,9 +1,15 @@
 repos:
-  - repo: https://github.com/pre-commit/mirrors-isort
-    rev: "v5.10.1"
+  - repo: https://github.com/pycqa/isort
+    rev: 5.11.2
     hooks:
       - id: isort
-        args: [ --config-root=., --resolve-all-configs ]
+        name: isort (python)
+      - id: isort
+        name: isort (cython)
+        types: [ cython ]
+      - id: isort
+        name: isort (pyi)
+        types: [ pyi ]
   - repo: https://github.com/psf/black
     rev: "24.10.0"
     hooks:
