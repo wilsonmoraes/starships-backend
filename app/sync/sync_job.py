@@ -9,6 +9,17 @@ from app.services.api_client import SWAPIClient
 logger = logging.getLogger(__name__)
 
 
+def parse_numeric_value(value, data_type=float):
+    if not value or value.lower() == 'unknown':
+        return None
+    if not value:
+        return None
+    try:
+        return data_type(value.replace(",", ""))
+    except ValueError:
+        return None
+
+
 class SyncJob:
     @staticmethod
     def sync_starships():
@@ -98,17 +109,17 @@ class SyncJob:
                     name=properties["name"],
                     model=properties["model"],
                     starship_class=properties["starship_class"],
-                    cost_in_credits=properties.get("cost_in_credits"),
-                    length=properties.get("length"),
-                    crew=properties.get("crew"),
-                    passengers=properties.get("passengers"),
+                    cost_in_credits=parse_numeric_value(properties.get("cost_in_credits"), float),
+                    length=parse_numeric_value(properties.get("length"), float),
+                    crew=parse_numeric_value(properties.get("crew"), int),
+                    passengers=parse_numeric_value(properties.get("passengers"), int),
                     max_atmosphering_speed=properties.get("max_atmosphering_speed"),
                     hyperdrive_rating=properties.get("hyperdrive_rating"),
                     MGLT=properties.get("MGLT"),
                     cargo_capacity=properties.get("cargo_capacity"),
                     consumables=properties.get("consumables"),
-                    created_at=properties["created"],
-                    edited_at=properties["edited"],
+                    created_at=datetime.fromisoformat(properties["created"].replace("Z", "+00:00")),
+                    edited_at=datetime.fromisoformat(properties["edited"].replace("Z", "+00:00")),
                     url=properties["url"],
                 )
                 db.session.add(starship)
@@ -116,16 +127,17 @@ class SyncJob:
                 starship.id = sh_id
                 starship.model = properties["model"]
                 starship.starship_class = properties["starship_class"]
-                starship.cost_in_credits = properties.get("cost_in_credits")
-                starship.length = properties.get("length")
-                starship.crew = properties.get("crew")
-                starship.passengers = properties.get("passengers")
+                starship.cost_in_credits = parse_numeric_value(properties.get("cost_in_credits"), float)
+                starship.length = parse_numeric_value(properties.get("length"), float)
+                starship.crew = parse_numeric_value(properties.get("crew"), int)
+                starship.passengers = parse_numeric_value(properties.get("passengers"), int)
                 starship.max_atmosphering_speed = properties.get("max_atmosphering_speed")
                 starship.hyperdrive_rating = properties.get("hyperdrive_rating")
                 starship.MGLT = properties.get("MGLT")
                 starship.cargo_capacity = properties.get("cargo_capacity")
                 starship.consumables = properties.get("consumables")
-                starship.edited_at = properties["edited"]
+                starship.edited_at = datetime.fromisoformat(properties["edited"].replace("Z", "+00:00"))
+            db.session.commit()
 
             SyncJob._sync_manufacturers(starship, properties["manufacturer"])
 
@@ -139,9 +151,11 @@ class SyncJob:
                 if not manufacturer:
                     manufacturer = Manufacturer(name=manufacturer_name)
                     db.session.add(manufacturer)
+                    db.session.commit()
 
                 if not StarshipManufacturer.query.filter_by(
                         starship_id=starship.id, manufacturer_id=manufacturer.id
                 ).first():
                     relation = StarshipManufacturer(starship_id=starship.id, manufacturer_id=manufacturer.id)
                     db.session.add(relation)
+                    db.session.commit()
