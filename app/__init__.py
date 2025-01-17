@@ -1,11 +1,10 @@
 import os
 
+from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
-migrate = Migrate()
+from app.models.db import init_db
+from app.sync.sync_job import SyncJob
 
 
 def create_app():
@@ -14,21 +13,26 @@ def create_app():
 
     app.secret_key = "supersecretkey"
 
+    app.config["SCHEDULER_API_ENABLED"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SQLALCHEMY_ECHO"] = True
 
-    db.init_app(app)
-    migrate.init_app(app, db)
+    init_db(app=app)
 
     from app.routes import app_routes
     app.register_blueprint(app_routes)
 
-    @app.cli.command("create-db")
-    def create_db():
-        """Create the database tables."""
-        with app.app_context():
-            db.create_all()
-        print("Database tables created.")
-
     return app
+
+
+scheduler = BackgroundScheduler()
+scheduler.start()
+
+scheduler.add_job(
+    id="sync_starships",
+    func=SyncJob.sync_starships,
+    trigger="interval",
+    seconds=10,
+    replace_existing=True,
+)

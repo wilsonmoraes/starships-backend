@@ -1,4 +1,4 @@
-from app import db
+from app.models.db import db
 
 
 class Manufacturer(db.Model):
@@ -15,7 +15,7 @@ class Manufacturer(db.Model):
 class Starship(db.Model):
     __tablename__ = "starships"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String, primary_key=True)
     name = db.Column(db.String, nullable=False)
     model = db.Column(db.String, nullable=False)
     starship_class = db.Column(db.String, nullable=False)
@@ -41,7 +41,7 @@ class StarshipManufacturer(db.Model):
     __tablename__ = "starship_manufacturers"
 
     id = db.Column(db.Integer, primary_key=True)
-    starship_id = db.Column(db.Integer, db.ForeignKey("starships.id"), nullable=False)
+    starship_id = db.Column(db.String, db.ForeignKey("starships.id"), nullable=False)
     manufacturer_id = db.Column(db.Integer, db.ForeignKey("manufacturers.id"), nullable=False)
 
     starship = db.relationship("Starship", back_populates="manufacturers")

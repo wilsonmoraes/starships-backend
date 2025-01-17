@@ -13,16 +13,9 @@ import requests
 class SWAPIClient:
 
     @staticmethod
-    def get_starships(page: int = 1, name: str = None, model: str = None):
-        """
-        Fetch all starships from the SWAPI with optional search by name or model.
-        Args:
-            page (int): Page number for pagination.
-            name (str, optional): Filter by starship name.
-            model (str, optional): Filter by starship model.
+    def get_starships(page: int = 1, limit=10, name: str = None, model: str = None):
 
-        """
-        url = f"{BASE_URL}/starships/?page={page}"
+        url = f"{BASE_URL}/starships/?page={page}&limit={limit}"
         if name:
             url += f"&name={name}"
         if model:
@@ -32,7 +25,7 @@ class SWAPIClient:
         return response.json()
 
     @staticmethod
-    def get_starship_by_id(starship_id: int) -> Dict[str, Any]:
+    def get_starship_by_id(starship_id: str) -> Dict[str, Any]:
         """
         Fetch a single starship by ID from the SWAPI.
         """
