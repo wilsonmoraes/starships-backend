@@ -1,12 +1,12 @@
-import requests
 from functools import lru_cache
+
+import requests
 
 BASE_URL = "https://swapi.tech/api/starships"
 
 
 @lru_cache(maxsize=32)
 def fetch_starships():
-    # Obter lista completa de naves com paginação
     response = requests.get(BASE_URL).json()
     total_pages = response["total_pages"]
 
@@ -27,7 +27,6 @@ def fetch_starship_details(uid):
 
 
 def get_detailed_starships():
-    # Obter lista completa de naves detalhadas
     starships = fetch_starships()
     detailed_starships = []
     for ship in starships:
