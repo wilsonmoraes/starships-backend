@@ -135,24 +135,32 @@ def get_starships():
                 example: 1600
     """
     manufacturer_id = request.args.get("manufacturer_id")
+    page = int(request.args.get("page", 1))
+    limit = int(request.args.get("limit", 10))
     query = Starship.query
 
     if manufacturer_id:
         query = query.join(starship_manufacturer).filter(
-            starship_manufacturer.c.manufacturer_id == int(manufacturer_id))
+            starship_manufacturer.c.manufacturer_id == int(manufacturer_id)
+        )
 
-    starships = query.all()
-    result = [
-        {
-            "id": s.id,
-            "name": s.name,
-            "model": s.model,
-            "manufacturer": [m.name for m in s.manufacturers],
-            "class": s.starship_class,
-            "length": s.length,
-        }
-        for s in starships
-    ]
+    total_items = query.count()
+    starships = query.offset((page - 1) * limit).limit(limit).all()
+
+    result = {
+        "starships": [
+            {
+                "id": s.id,
+                "name": s.name,
+                "model": s.model,
+                "manufacturer": [m.name for m in s.manufacturers],
+                "class": s.starship_class,
+                "length": s.length,
+            }
+            for s in starships
+        ],
+        "total_items": total_items,
+    }
     return jsonify(result)
 
 
