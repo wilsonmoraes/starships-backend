@@ -1,13 +1,11 @@
 import os
+from typing import Dict, Any
 
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 BASE_URL = os.environ["BASE_URL"]
-
-import requests
-
-from typing import Any, Dict
 
 
 class SWAPIClient:
