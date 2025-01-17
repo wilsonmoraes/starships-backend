@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 
 from app.models.db import db
-from app.models.db.starships import Starship, Manufacturer, starship_manufacturer
+from app.models.db.starships import Manufacturer, Starship, starship_manufacturer
 from app.models.db.sync_metadata import SyncMetadata
 from app.services.api_client import SWAPIClient
 
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def parse_numeric_value(value, data_type=float):
-    if not value or value.lower() == 'unknown':
+    if not value or value.lower() == "unknown":
         return None
     if not value:
         return None
@@ -39,7 +39,9 @@ class SyncJob:
                 db.session.commit()
 
             if sync_metadata.is_running:
-                if sync_metadata.last_synced and sync_metadata.last_synced < current_time - timedelta(hours=5):
+                if sync_metadata.last_synced and sync_metadata.last_synced < current_time - timedelta(
+                    hours=5
+                ):
                     logger.warning("Synchronization stuck for over 5 hours. Restarting...")
                 else:
                     logger.info("Another synchronization is already in progress. Aborting...")
@@ -93,6 +95,7 @@ class SyncJob:
         logger.info("Expunging starships not present in the API...")
 
         from run import application
+
         with application.app_context():
             batch_size = 900
             db_ids = Starship.query.with_entities(Starship.id).all()
@@ -102,7 +105,7 @@ class SyncJob:
             ids_to_delete = [curr_id for curr_id in db_ids if curr_id not in ids_to_keep]
 
             for i in range(0, len(ids_to_delete), batch_size):
-                batch = ids_to_delete[i:i + batch_size]
+                batch = ids_to_delete[i : i + batch_size]
                 Starship.query.filter(Starship.id.in_(batch)).delete(synchronize_session=False)
 
             db.session.commit()
@@ -113,6 +116,7 @@ class SyncJob:
         logger.debug(f"Upserting starship with ID {sh_id}.")
 
         from run import application
+
         with application.app_context():
             logger.info(f"Updating existing starship with ID {sh_id}.")
 
@@ -160,6 +164,7 @@ class SyncJob:
         logger.debug(f"Syncing manufacturers for starship ID {starship.id}.")
 
         from run import application
+
         with application.app_context():
             manufacturers = manufacturer_data.split(", ")
             for manufacturer_name in manufacturers:
@@ -173,15 +178,16 @@ class SyncJob:
                 relation_exists = db.session.query(
                     db.exists().where(
                         starship_manufacturer.c.starship_id == starship.id,
-                        starship_manufacturer.c.manufacturer_id == manufacturer.id
+                        starship_manufacturer.c.manufacturer_id == manufacturer.id,
                     )
                 ).scalar()
 
                 if not relation_exists:
-                    logger.info(f"Adding relation between starship {starship.id} and manufacturer {manufacturer.id}.")
+                    logger.info(
+                        f"Adding relation between starship {starship.id} and manufacturer {manufacturer.id}."
+                    )
                     stmt = starship_manufacturer.insert().values(
-                        starship_id=starship.id,
-                        manufacturer_id=manufacturer.id
+                        starship_id=starship.id, manufacturer_id=manufacturer.id
                     )
                     db.session.execute(stmt)
                     db.session.commit()

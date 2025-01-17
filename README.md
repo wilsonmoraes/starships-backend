@@ -234,4 +234,3 @@ To enable automatic synchronization, ensure the scheduler is initialized when th
 ## **License**
 
 This project is licensed under the MIT License.
-

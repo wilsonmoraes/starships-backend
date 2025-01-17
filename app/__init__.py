@@ -11,7 +11,7 @@ from app.sync.sync_job import SyncJob
 
 
 def create_app():
-    template_dir = os.path.join(os.path.dirname(__file__), '../templates')
+    template_dir = os.path.join(os.path.dirname(__file__), "../templates")
     app = Flask(__name__, template_folder=template_dir)
 
     app.secret_key = "supersecretkey"
@@ -24,6 +24,7 @@ def create_app():
     init_db(app=app)
 
     from app.routes import app_routes
+
     app.register_blueprint(app_routes)
     CORS(app)
 

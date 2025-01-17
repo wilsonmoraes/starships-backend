@@ -1,10 +1,10 @@
 import hmac
 import logging
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify, request
 from flask_jwt_extended import create_access_token, jwt_required
 
-from .models.db.starships import Starship, Manufacturer, starship_manufacturer
+from .models.db.starships import Manufacturer, Starship, starship_manufacturer
 
 logger = logging.getLogger(__name__)
 

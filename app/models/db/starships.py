@@ -1,7 +1,6 @@
-from sqlalchemy import Table, Integer, ForeignKey, Column
+from sqlalchemy import Column, ForeignKey, Integer, Table
 
 from app.models.db import db
-
 
 starship_manufacturer = Table(
     "starship_manufacturer",
@@ -9,6 +8,7 @@ starship_manufacturer = Table(
     Column("starship_id", Integer, ForeignKey("starships.id"), primary_key=True),
     Column("manufacturer_id", Integer, ForeignKey("manufacturers.id"), primary_key=True),
 )
+
 
 class Starship(db.Model):
     __tablename__ = "starships"
@@ -35,6 +35,7 @@ class Starship(db.Model):
         secondary="starship_manufacturer",
         back_populates="starships",
     )
+
 
 class Manufacturer(db.Model):
     __tablename__ = "manufacturers"

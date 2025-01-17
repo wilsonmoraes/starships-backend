@@ -31,8 +31,5 @@ def get_detailed_starships():
     detailed_starships = []
     for ship in starships:
         details = fetch_starship_details(ship["url"])
-        detailed_starships.append({
-            "name": details["name"],
-            "manufacturer": details["manufacturer"]
-        })
+        detailed_starships.append({"name": details["name"], "manufacturer": details["manufacturer"]})
     return detailed_starships

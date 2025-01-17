@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 BASE_URL = os.environ["BASE_URL"]
 
-from typing import Dict, Any
+from typing import Any, Dict
 
 import requests
 
@@ -13,7 +13,7 @@ import requests
 class SWAPIClient:
 
     @staticmethod
-    def get_starships(page: int = 1, limit=10, name: str = None, model: str = None):
+    def get_starships(page: int = 1, limit=10, name: str = "", model: str = ""):
 
         url = f"{BASE_URL}/starships/?page={page}&limit={limit}"
         if name:
