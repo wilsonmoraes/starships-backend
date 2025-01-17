@@ -11,7 +11,7 @@ def test_get_starships(mock_get):
     mock_get.return_value.status_code = 200
     mock_get.return_value.json.return_value = {
         "count": 1,
-        "results": [{"name": "Millennium Falcon", "model": "YT-1300"}]
+        "results": [{"name": "Millennium Falcon", "model": "YT-1300"}],
     }
 
     result = SWAPIClient.get_starships(page=1, limit=1, name="Falcon", model="YT-1300")
