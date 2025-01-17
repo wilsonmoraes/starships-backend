@@ -162,7 +162,6 @@ class SyncJob:
                 ).scalar()
 
                 if not relation_exists:
-                    # Criar relação entre nave e fabricante
                     stmt = starship_manufacturer.insert().values(
                         starship_id=starship.id,
                         manufacturer_id=manufacturer.id
