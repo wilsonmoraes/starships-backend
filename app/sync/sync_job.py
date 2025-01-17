@@ -17,6 +17,7 @@ def parse_numeric_value(value, data_type=float):
     try:
         return data_type(value.replace(",", ""))
     except ValueError:
+        logger.debug(f"Could not parse value '{value}' to {data_type}. Returning None.")
         return None
 
 
@@ -25,12 +26,14 @@ class SyncJob:
     def sync_starships():
         from run import application
 
+        logger.info("Starting starships synchronization process...")
         with application.app_context():
             current_time = datetime.utcnow()
 
             sync_metadata = SyncMetadata.query.filter_by(entity="starships").first()
 
             if not sync_metadata:
+                logger.info("Creating initial SyncMetadata entry for starships.")
                 sync_metadata = SyncMetadata(entity="starships", last_synced=None, is_running=False)
                 db.session.add(sync_metadata)
                 db.session.commit()
@@ -44,6 +47,7 @@ class SyncJob:
 
             sync_metadata.is_running = True
             db.session.commit()
+            logger.info("Marked synchronization as in progress.")
 
             try:
                 SyncJob._perform_starships_sync()
@@ -53,6 +57,7 @@ class SyncJob:
                 sync_metadata.is_running = False
                 sync_metadata.last_synced = current_time
                 db.session.commit()
+                logger.info("Synchronization process completed.")
 
     @staticmethod
     def _perform_starships_sync():
@@ -63,12 +68,16 @@ class SyncJob:
         starships_summary = first_page_data.get("results", [])
         for starship_summary in starships_summary:
             api_ids.append(starship_summary["uid"])
+        logger.debug(f"Fetched data for page 1 with {len(starships_summary)} starships.")
 
         for page in range(2, total_pages + 1):
+            logger.debug(f"Fetching data for page {page}...")
             data = SWAPIClient.get_starships(page=page)
             starships_summary = data.get("results", [])
             for starship_summary in starships_summary:
                 api_ids.append(starship_summary["uid"])
+
+        logger.info(f"Fetched data for all {total_pages} pages. Total starships: {len(api_ids)}")
 
         SyncJob._expunge_starships_not_in(api_ids)
 
@@ -81,8 +90,9 @@ class SyncJob:
 
     @staticmethod
     def _expunge_starships_not_in(api_ids):
-        from run import application
+        logger.info("Expunging starships not present in the API...")
 
+        from run import application
         with application.app_context():
             batch_size = 900
             db_ids = Starship.query.with_entities(Starship.id).all()
@@ -96,12 +106,16 @@ class SyncJob:
                 Starship.query.filter(Starship.id.in_(batch)).delete(synchronize_session=False)
 
             db.session.commit()
+        logger.info("Expunge operation completed.")
 
     @staticmethod
     def _upsert_starship(sh_id: str, properties):
+        logger.debug(f"Upserting starship with ID {sh_id}.")
 
         from run import application
         with application.app_context():
+            logger.info(f"Updating existing starship with ID {sh_id}.")
+
             starship = Starship.query.filter_by(id=sh_id).first()
             if not starship:
                 starship = Starship(
@@ -143,13 +157,15 @@ class SyncJob:
 
     @staticmethod
     def _sync_manufacturers(starship, manufacturer_data):
+        logger.debug(f"Syncing manufacturers for starship ID {starship.id}.")
+
         from run import application
         with application.app_context():
             manufacturers = manufacturer_data.split(", ")
             for manufacturer_name in manufacturers:
-
                 manufacturer = Manufacturer.query.filter_by(name=manufacturer_name).first()
                 if not manufacturer:
+                    logger.info(f"Creating new manufacturer: {manufacturer_name}.")
                     manufacturer = Manufacturer(name=manufacturer_name)
                     db.session.add(manufacturer)
                     db.session.commit()
@@ -162,6 +178,7 @@ class SyncJob:
                 ).scalar()
 
                 if not relation_exists:
+                    logger.info(f"Adding relation between starship {starship.id} and manufacturer {manufacturer.id}.")
                     stmt = starship_manufacturer.insert().values(
                         starship_id=starship.id,
                         manufacturer_id=manufacturer.id
