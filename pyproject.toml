@@ -10,4 +10,4 @@ force_grid_wrap = 0
 use_parentheses = true
 sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
 default_section = "THIRDPARTY"
-known_third_party = dotenv, requests
+known_third_party = [dotenv, requests]

@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Integer, Table, Column
+from sqlalchemy import Column, ForeignKey, Integer, Table
 
 from app.models.db import db
 
